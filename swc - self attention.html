@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Self-Attention Mechanism Visualization with Explanations</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        #root {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const SelfAttentionVisualization = () => {
+            const [activeToken, setActiveToken] = React.useState(0);
+            const [phase, setPhase] = React.useState('query');
+            const tokens = ['The', 'cat', 'sat', 'on', 'the', 'mat'];
+            const colors = ['#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', '#98D8C8', '#F7DC6F'];
+
+            const explanations = {
+                query: "Query: The active token creates a query vector to search for relevant information.",
+                key: "Key: The query is compared with key vectors of all tokens to determine relevance.",
+                value: "Value: The token combines value vectors from all tokens, weighted by attention scores."
+            };
+
+            React.useEffect(() => {
+                const interval = setInterval(() => {
+                    if (phase === 'query') {
+                        setPhase('key');
+                    } else if (phase === 'key') {
+                        setPhase('value');
+                    } else {
+                        setPhase('query');
+                        setActiveToken((activeToken + 1) % tokens.length);
+                    }
+                }, 3000);
+
+                return () => clearInterval(interval);
+            }, [phase, activeToken]);
+
+            const renderTokens = () => {
+                return tokens.map((token, index) => (
+                    <g key={`token-${index}`}>
+                        <rect
+                            x={index * 100 + 50}
+                            y={50}
+                            width={80}
+                            height={40}
+                            fill={colors[index]}
+                            stroke="black"
+                        />
+                        <text
+                            x={index * 100 + 90}
+                            y={75}
+                            textAnchor="middle"
+                            dominantBaseline="middle"
+                            fontWeight="bold"
+                        >
+                            {token}
+                        </text>
+                    </g>
+                ));
+            };
+
+            const renderConnections = () => {
+                return tokens.map((_, index) => (
+                    <line
+                        key={`connection-${index}`}
+                        x1={activeToken * 100 + 90}
+                        y1={90}
+                        x2={index * 100 + 90}
+                        y2={50}
+                        stroke={phase === 'value' ? colors[index] : 'rgba(0, 0, 0, 0.2)'}
+                        strokeWidth={phase === 'value' ? 3 : 1}
+                    />
+                ));
+            };
+
+            const renderPhaseCircles = () => {
+                const circleY = phase === 'query' ? 120 : (phase === 'key' ? 160 : 200);
+                return tokens.map((_, index) => (
+                    <circle
+                        key={`phase-${index}`}
+                        cx={index * 100 + 90}
+                        cy={circleY}
+                        r={10}
+                        fill={index === activeToken ? colors[index] : 'white'}
+                        stroke="black"
+                    />
+                ));
+            };
+
+            return (
+                <div style={{ width: '100%', height: '500px', backgroundColor: '#f8f9fa', borderRadius: '8px', overflow: 'hidden' }}>
+                    <svg width="100%" height="100%" viewBox="0 0 700 400">
+                        {renderTokens()}
+                        {renderConnections()}
+                        {renderPhaseCircles()}
+                        <text x="10" y="20" fontWeight="bold">Self attention</text>
+                        <text x="10" y="125" fontWeight="bold">Query</text>
+                        <text x="10" y="165" fontWeight="bold">Key</text>
+                        <text x="10" y="205" fontWeight="bold">Value</text>
+                        <text x="10" y="280" fontWeight="bold">{`Active Token: "${tokens[activeToken]}"`}</text>
+                        <text x="250" y="280" fontWeight="bold">{`Phase: ${phase.charAt(0).toUpperCase() + phase.slice(1)}`}</text>
+                        <text x="450" y="280" fontWeight="bold">Self-Attention</text>
+
+                        <rect x="10" y="300" width="680" height="80" fill="#f0f0f0" rx="10" ry="10" />
+                        <text x="20" y="320" fontWeight="bold">Explanation:</text>
+                        <text x="20" y="350" width="660" style={{ wordWrap: 'break-word' }}>
+                            {explanations[phase]}
+                        </text>
+                    </svg>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<SelfAttentionVisualization />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>
