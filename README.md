@@ -6,7 +6,7 @@ The overall approach of creating a self-contained, interactive visualization in 
 
 This combination of techniques allows for a highly portable, easily shareable visualization that can run directly in a web browser without any build steps or server requirements. It's particularly useful for educational purposes, quick prototypes, or when you want to share a working demo with minimal setup required from the recipient.
 
-|Example: artificial neural network|Methods|Description|
+|Example: neural network|Methods|Description|
 |-|-|-|
 |Animation|React Hooks (useState and useEffect)|useState: Used to manage the state of the animation (epoch, phase, activeLayer).|
 |||useEffect: Used to create an animation loop that updates the state over time.|
