@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlashAttention and FlashAttention-2 Comparison</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .comparison {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .mechanism {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 45%;
+        }
+
+        .mechanism-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .animation-box {
+            width: 200px;
+            height: 200px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .shape {
+            position: absolute;
+            transition: all 0.5s ease;
+        }
+
+        .grid {
+            width: 160px;
+            height: 160px;
+            border: 2px solid #3b82f6;
+            opacity: 0.3;
+        }
+
+        .data {
+            width: 40px;
+            height: 40px;
+            background-color: #10b981;
+        }
+
+        .cpu {
+            width: 40px;
+            height: 40px;
+            background-color: #8b5cf6;
+        }
+
+        .arrow {
+            width: 20px;
+            height: 20px;
+            border-top: 2px solid #ef4444;
+            border-right: 2px solid #ef4444;
+            transform: rotate(45deg);
+        }
+
+        .characteristics {
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .step-description {
+            font-size: 18px;
+            margin-top: 20px;
+            text-align: center;
+            max-width: 500px;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .pulse {
+            animation: pulse 0.5s;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const FlashAttentionComparison = () => {
+            const [step, setStep] = useState(0);
+            const [isAnimating, setIsAnimating] = useState(false);
+
+            const steps = [
+                "Initial State",
+                "Load Data",
+                "Compute Attention",
+                "Update Memory"
+            ];
+
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    setStep((prevStep) => (prevStep + 1) % steps.length);
+                    setIsAnimating(true);
+                    setTimeout(() => setIsAnimating(false), 500);
+                }, 3000);
+
+                return () => clearInterval(timer);
+            }, []);
+
+            const renderAttentionMechanism = (title, isFlashAttention2) => (
+                <div className="mechanism">
+                    <h2 className="mechanism-title">{title}</h2>
+                    <div className="animation-box">
+                        <div className="shape grid" />
+                        <div className={`shape data ${isAnimating ? 'pulse' : ''}`} style={{ opacity: step >= 1 ? 1 : 0, top: '10px', left: '10px' }} />
+                        {isFlashAttention2 && <div className={`shape arrow ${isAnimating ? 'pulse' : ''}`} style={{ opacity: step >= 1 ? 1 : 0, top: '20px', left: '55px' }} />}
+                        <div className={`shape cpu ${isAnimating ? 'pulse' : ''}`} style={{ opacity: step >= 2 ? 1 : 0 }} />
+                        <div className={`shape data ${isAnimating ? 'pulse' : ''}`} style={{ opacity: step >= 3 ? 1 : 0, bottom: '10px', right: '10px' }} />
+                        {isFlashAttention2 && <div className={`shape arrow ${isAnimating ? 'pulse' : ''}`} style={{ opacity: step >= 3 ? 1 : 0, bottom: '20px', right: '55px', transform: 'rotate(225deg)' }} />}
+                    </div>
+                    <div className="characteristics">
+                        <p>Tiling: {isFlashAttention2 ? 'Enhanced' : 'Basic'}</p>
+                        <p>Memory Access: {isFlashAttention2 ? 'Optimized' : 'Improved'}</p>
+                        <p>Speed: {isFlashAttention2 ? 'Faster' : 'Fast'}</p>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="container">
+                    <h1 className="title">FlashAttention Comparison</h1>
+                    <h2 className="mechanism-title">FlashAttention and FlashAttention-2 indeed optimize the attention computation in transformers by breaking it into smaller chunks.</h2>
+                    <h2 className="mechanism-title">This approach reduces the number of intermediate read/write operations to GPU memory, which significantly speeds up both training and inference.</h2>
+                    <div className="comparison">
+                        {renderAttentionMechanism("FlashAttention", false)}
+                        {renderAttentionMechanism("FlashAttention-2", true)}
+                    </div>
+                    <p className="step-description">
+                        {step === 0 && "Both mechanisms start with an empty attention matrix."}
+                        {step === 1 && "FlashAttention-2 loads data more efficiently with enhanced tiling strategies."}
+                        {step === 2 && "FlashAttention-2 computes attention faster due to improved algorithms and memory layout."}
+                        {step === 3 && "FlashAttention-2 updates memory with optimized access patterns, reducing bandwidth usage."}
+                    </p>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<FlashAttentionComparison />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>

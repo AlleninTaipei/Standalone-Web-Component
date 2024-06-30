@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LORA Explanation Animation</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/17.0.2/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/17.0.2/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .animation-box {
+            width: 200px;
+            height: 200px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .shape {
+            position: absolute;
+            transition: all 0.5s ease;
+        }
+
+        .square {
+            width: 160px;
+            height: 160px;
+            background-color: #3b82f6;
+        }
+
+        .circle {
+            width: 60px;
+            height: 60px;
+            background-color: #10b981;
+            border-radius: 50%;
+        }
+
+        .triangle {
+            width: 0;
+            height: 0;
+            border-left: 80px solid transparent;
+            border-right: 80px solid transparent;
+            border-bottom: 128px solid #8b5cf6;
+        }
+
+        .step-description {
+            font-size: 18px;
+            margin-top: 20px;
+            text-align: center;
+            max-width: 300px;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .bounce {
+            animation: bounce 0.5s;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const LORAExplanation = () => {
+            const [step, setStep] = useState(0);
+            const [isAnimating, setIsAnimating] = useState(false);
+
+            const steps = [
+                "Original Model",
+                "LORA Adaptation",
+                "Fine-tuned Model"
+            ];
+
+            useEffect(() => {
+                const timer = setInterval(() => {
+                    setStep((prevStep) => (prevStep + 1) % steps.length);
+                    setIsAnimating(true);
+                    setTimeout(() => setIsAnimating(false), 500);
+                }, 3000);
+
+                return () => clearInterval(timer);
+            }, []);
+
+            return (
+                <div className="container">
+                    <h1 className="title">LORA: Low-Rank Adaptation</h1>
+                    <div className="animation-box">
+                        <div className={`shape square ${isAnimating ? 'bounce' : ''}`} style={{ opacity: step >= 0 ? 1 : 0 }} />
+                        <div className={`shape circle ${isAnimating ? 'bounce' : ''}`} style={{ opacity: step >= 1 ? 1 : 0 }} />
+                        <div className={`shape triangle ${isAnimating ? 'bounce' : ''}`} style={{ opacity: step >= 2 ? 1 : 0 }} />
+                    </div>
+                    <p className="step-description">
+                        {step === 0 && "Start with a pre-trained large language model."}
+                        {step === 1 && "Apply LORA to adapt a small set of parameters."}
+                        {step === 2 && "Result: A fine-tuned model with minimal parameter changes."}
+                    </p>
+                </div>
+            );
+        };
+
+        ReactDOM.render(<LORAExplanation />, document.getElementById('root'));
+    </script>
+</body>
+
+</html>
