@@ -21,10 +21,6 @@ This combination of techniques allows for a highly portable, easily shareable vi
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Contact
-
-If you have any questions or suggestions, feel free to open an issue or contact me at [allenintaipei@gmail.com](mailto:allnintapei@gmil.com).
-
 ---
 
 Made with ❤️ by [Allen Sun](https://github.com/allenintaipei)
